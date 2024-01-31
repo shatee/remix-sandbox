@@ -1,6 +1,12 @@
-import { Await, Link, useLocation, useParams } from "@remix-run/react";
+import { Await, ClientLoaderFunction, Link, useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import memoizeOne from "memoize-one";
-import React, { Suspense } from "react";
+import { Suspense, useCallback } from "react";
+
+export const clientLoader: ClientLoaderFunction = async ({ params }) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${params.id}`);
+  return await response.json() as { name: string };
+}
 
 const fetchPoke = memoizeOne(async (id: string) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -11,17 +17,28 @@ const fetchPoke = memoizeOne(async (id: string) => {
 export default function Poke() {
   const params = useParams();
   console.log('params', params.id);
+  const loaderData = useLoaderData<{ name: string }>();
+
+  const navigate = useNavigate();
+
+  const poke4 = useCallback(() => {
+    navigate('/poke/4', {
+      unstable_flushSync: true
+    })
+  }, [navigate]);
 
   return (
     <Suspense fallback="poke">
       <div style={{ background: '#789' }}>
         <h1>Poke</h1>
         <h2>{params.id}</h2>
+        <div>loaderData: {loaderData.name}</div>
         <ul>
           <li><Link to="/">/</Link></li>
           <li><Link to="/poke/1">/poke/1</Link></li>
           <li><Link to="/poke/2">/poke/2</Link></li>
           <li><Link to="/poke/3">/poke/3</Link></li>
+          <li><button onClick={poke4}>/poke/4</button></li>
         </ul>
         <Suspense fallback={<div>Loading...</div>}>
           <AsyncComponent id={params.id!} />
@@ -40,7 +57,7 @@ function AsyncComponent({ id }: AsyncComponentProps) {
   const awaited = fetchPoke(id);
   return <Await resolve={awaited}>
     {(data) => (
-      <div>{data.name}</div>
+      <div>AsyncComponent: {data.name}</div>
     )}
   </Await>;
 }
@@ -48,5 +65,5 @@ function AsyncComponent({ id }: AsyncComponentProps) {
 // function AsyncComponent({ id }: AsyncComponentProps) {
 //   console.log('AsyncComponent', id);
 //   const data = (React as any).use(fetchPoke(id));
-//   return <div>{data.name}</div>;
+//   return <div>AsyncComponent: {data.name}</div>;
 // }
