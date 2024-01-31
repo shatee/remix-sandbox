@@ -16,8 +16,9 @@
     "@remix-run/react": "^2.5.1",
     "@remix-run/serve": "^2.5.1",
     "isbot": "^4.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "memoize-one": "^6.0.0",
+    "react": "^18.3.0-canary-e1d20fc0c-20240122",
+    "react-dom": "^18.3.0-canary-e1d20fc0c-20240122"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.5.1",
