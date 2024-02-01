@@ -13,7 +13,7 @@ export default function Poke() {
   console.log('params', params.id);
 
   return (
-    <Suspense fallback="poke">
+    <Suspense fallback="poke" key={params.id}>
       <div style={{ background: '#789' }}>
         <h1>Poke</h1>
         <h2>id: {params.id}</h2>
